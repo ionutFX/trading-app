@@ -1,19 +1,48 @@
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import React, {Component} from 'react';
+import { ActivityIndicator } from 'react-native';
+// import { StyleSheet, Text, View } from 'react-native';
+import Navigation from './src/screens';
+import { images } from './src/constants/images';
+import { cacheImages } from './src/utils/cacheImages';
+import { render } from 'react-dom';
+import { AppLoading } from 'expo';
+import { UtilityThemeProvider , Box, Text} from 'react-native-design-utility';
+import { theme } from "./src/constants/theme";
 
-export default function App() {
-  return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-    </View>
-  );
+
+export default class App extends React.Component {
+
+  state = {
+    isReady: false
+  }
+
+  // componentDidMount(){
+  //   this.cacheAssets();
+  // }
+
+  _loadAssetsAsync = async () =>{
+    const imagesAssets = cacheImages(Object.values( images ));
+
+    await Promise.all([...imagesAssets]);
+
+  }
+
+  render(){
+    if (!this.state.isReady) {
+      return (
+        <AppLoading
+          startAsync={this._loadAssetsAsync}
+          onFinish={() => this.setState({ isReady: true })}
+          onError={console.warn}
+        />
+      );
+    }
+    return (
+      <UtilityThemeProvider theme={theme}>
+        <Navigation>
+        </Navigation>
+      </UtilityThemeProvider>
+    );
+  };
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
